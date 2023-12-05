@@ -20,7 +20,7 @@ if(isset($_POST['login']))
 
 	// Check if authentication was successful
 	if ($response['authenticated']) {
-		$_SESSION['bbdmsdid']=$_POST['email'];
+		$_SESSION['bbdmsdid']=$response['id'];
 		$_SESSION['login']=$_POST['email'];
                  echo "<script type='text/javascript'> document.location ='index.php'; </script>";
 	} else {
