@@ -1,6 +1,6 @@
 <?php 
 // DB credentials.
-define('DB_HOST','bloodstore.mysql.database.azure.com');
+define('DB_HOST','cloudbloodstore.mysql.database.azure.com');
 define('DB_USER','ram');
 define('DB_PASS','pass@1234567');
 define('DB_NAME','bbdms');
