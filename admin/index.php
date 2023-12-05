@@ -5,20 +5,31 @@ if(isset($_POST['login']))
 {
 $username=$_POST['username'];
 $password=md5($_POST['password']);
-$sql ="SELECT UserName,Password FROM tbladmin WHERE UserName=:username and Password=:password";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':username', $username, PDO::PARAM_STR);
-$query-> bindParam(':password', $password, PDO::PARAM_STR);
-$query-> execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-if($query->rowCount() > 0)
-{
-$_SESSION['alogin']=$_POST['username'];
-echo "<script type='text/javascript'> document.location = 'dashboard.php'; </script>";
-} else{
-  
-  echo "<script>alert('Invalid Details');</script>";
+$data=array('email'=>$username,'password'=>$password);
+     $azfendpoint='https://bloodfunction.azurewebsites.net/api/HttpTrigger2?code=jH9Sp5VozmXkeVor95okuibi7jOg7bb0qmUlfUv3VeMYAzFuRq853Q==';
+   $options = array(
+        'http' => array(
+            'method' => 'POST',
+            'content' => json_encode($data)
+        )
+    );
+    $context = stream_context_create($options);
+    $result = file_get_contents($azfendpoint, false, $context);
+   if ($result !== FALSE) {
+	$response = json_decode($result, true);
 
+	// Check if authentication was successful
+	if ($response['authenticated']) {
+		$_SESSION['alogin']=$_POST['username'];
+echo "<script type='text/javascript'> document.location = 'dashboard.php'; </script>";
+	} else {
+		// Authentication failed, handle accordingly
+		 echo "<script>alert('Invalid Details');</script>";
+	}
+} else {
+	// Error in communicating with Azure Function
+	   echo "<script>not authenticated</script>";
+  
 }
 
 }
