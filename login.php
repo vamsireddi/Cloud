@@ -5,21 +5,31 @@ if(isset($_POST['login']))
   {
     $email=$_POST['email'];
     $password=md5($_POST['password']);
-    $sql ="SELECT id FROM tblblooddonars WHERE EmailId=:email and Password=:password";
-    $query=$dbh->prepare($sql);
-    $query->bindParam(':email',$email,PDO::PARAM_STR);
-$query-> bindParam(':password', $password, PDO::PARAM_STR);
-    $query-> execute();
-    $results=$query->fetchAll(PDO::FETCH_OBJ);
-    if($query->rowCount() > 0)
-{
-foreach ($results as $result) {
-$_SESSION['bbdmsdid']=$result->id;
-}
-$_SESSION['login']=$_POST['email'];
-echo "<script type='text/javascript'> document.location ='index.php'; </script>";
-} else{
-echo "<script>alert('Invalid Details');</script>";
+    $data=array('email'=>$email,'password'=>$password);
+     $azfendpoint='https://bloodfunction.azurewebsites.net/api/HttpTrigger1?code=Ek3BEI750jMb3VD41YSLY0UvuqR3hXhEuZv-_Ws3pTyWAzFunZkDEQ==';
+   $options = array(
+        'http' => array(
+            'method' => 'POST',
+            'content' => json_encode($data)
+        )
+    );
+    $context = stream_context_create($options);
+    $result = file_get_contents($azfendpoint, false, $context);
+   if ($result !== FALSE) {
+	$response = json_decode($result, true);
+
+	// Check if authentication was successful
+	if ($response['authenticated']) {
+		$_SESSION['login']=$_POST['email'];
+                 echo "<script type='text/javascript'> document.location ='index.php'; </script>";
+	} else {
+		// Authentication failed, handle accordingly
+		echo "<script>alert('Invalid Details');</script>";
+	}
+} else {
+	// Error in communicating with Azure Function
+	   echo "<script>not authenticated</script>";
+  
 }
 }
 ?>
